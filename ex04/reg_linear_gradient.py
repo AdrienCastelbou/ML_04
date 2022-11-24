@@ -11,11 +11,9 @@ def predict_(x, theta):
 def reg_linear_grad(y, x, theta, lambda_):
     nabla_J = np.zeros(theta.shape)
     for x_i, y_i, y_hat_i in zip(x, y, predict_(x, theta)):
-        for j in range(theta.shape[0]):
-            if j == 0:
-                nabla_J[j] += (y_hat_i - y_i)
-            else:
-                nabla_J[j] += (y_hat_i - y_i) * x_i[j - 1] + lambda_ * theta[j]
+        nabla_J[0] += (y_hat_i - y_i)
+        nabla_J[1:] += (y_hat_i - y_i) * x_i.reshape(-1, 1)
+    nabla_J[1: ] += lambda_ * theta[1:]
     return nabla_J / y.shape[0]
 
 
@@ -32,6 +30,10 @@ def main_test():
     theta = np.array([[7.01], [3], [10.5], [-6]])
     print(reg_linear_grad(y, x, theta, 1))
     print(vec_reg_linear_grad(y, x, theta, 1))
+    print(reg_linear_grad(y, x, theta, 0.5))
+    print(vec_reg_linear_grad(y, x, theta, 0.5))
+    print(reg_linear_grad(y, x, theta, 0.0))
+    print(vec_reg_linear_grad(y, x, theta, 0.0))
 
 if __name__ == "__main__":
     main_test()
