@@ -1,13 +1,20 @@
 import numpy as np
 
 def reg_loss_(y, y_hat, theta, lambda_):
-    def loss_(eps=1e-15):
-        return float((y_hat - y).T.dot(y_hat - y))
-    def l2():
+    try:
+        if type(y) != np.ndarray or type(y_hat) != np.ndarray or type(theta) != np.ndarray or type(lambda_) != float:
+            return None
+        if y.shape[1] != 1 or y.shape != y_hat.shape or theta.shape[1] != 1:
+            return None
+        if len(y) == 0 or len(y_hat) == 0 or len(theta) == 0:
+            return None
+        loss_ = float((y_hat - y).T.dot(y_hat - y))
         prime_theta = np.array(theta)
         prime_theta[0][0] = 0
-        return float(prime_theta.T.dot(prime_theta))
-    return (loss_() + lambda_ * l2()) / (2 * y.shape[0])
+        l2 = float(prime_theta.T.dot(prime_theta))
+        return (loss_ + lambda_ * l2) / (2 * y.shape[0])
+    except:
+        return None
 
 
 def main_test():
