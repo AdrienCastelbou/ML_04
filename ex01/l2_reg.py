@@ -1,16 +1,26 @@
 import numpy as np
 
 def iterative_l2(theta):
-    res = 0
-    for i in range(theta.shape[0]):
-        if i > 0:
-            res += theta[i] ** 2
-    return float(res)
+    try:
+        if type(theta) != np.ndarray or theta.shape[1] != 1 or len(theta) == 0:
+            return None
+        res = 0
+        for i in range(theta.shape[0]):
+            if i > 0:
+                res += theta[i] ** 2
+        return float(res)
+    except:
+        return None
 
 def l2(theta):
-    prime_theta = np.array(theta)
-    prime_theta[0][0] = 0
-    return float(prime_theta.T.dot(prime_theta))
+    try:
+        if type(theta) != np.ndarray or theta.shape[1] != 1 or len(theta) == 0:
+            return None
+        prime_theta = np.array(theta)
+        prime_theta[0][0] = 0
+        return float(prime_theta.T.dot(prime_theta))
+    except:
+        return None
 
 
 def main_test():
