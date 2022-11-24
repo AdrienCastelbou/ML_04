@@ -57,6 +57,12 @@ class MyRidge(MyLinearRegression):
         except:
             return None
         
+    def loss_elem_(self, y, y_hat):
+        try:
+            return super().loss_elem_(y, y_hat)
+        except:
+            return None
+
     def predict_(self, x):
         try:
             return super().predict_(x)
