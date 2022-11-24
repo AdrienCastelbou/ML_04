@@ -6,12 +6,9 @@ from ridge import MyRidge
 from sklearn.linear_model import Ridge
 
 
+
+
 def main():
-    mylr = MyRidge(np.array([[1.], [1.], [1.], [1.], [1]]))
-    print(mylr.get_params_())
-    mylr.set_params({'alpha': 22, 'max_iter': 33, 'thetas': np.array([[1.], [1.], [1]]), 'lambda_': 2})
-    print(mylr.get_params_())
-    return
     X = np.array([[1., 1., 2., 3.], [5., 8., 13., 21.], [34., 55., 89., 144.]])
     Y = np.array([[23.], [48.], [218.]])
     mylr = MyRidge(np.array([[1.], [1.], [1.], [1.], [1]]))
