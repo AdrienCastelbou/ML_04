@@ -7,7 +7,6 @@ import numpy as np
 import pickle
 import matplotlib.pyplot as plt
 
-
 def data_cross_splitter(x, y):
     perm = np.random.permutation(len(x))
     s_x = x[perm]
@@ -18,9 +17,16 @@ def data_cross_splitter(x, y):
 
 
 def normalize(x):
-    mean_X = np.mean(x)
-    std_X = np.std(x)
-    return (x - mean_X) / std_X 
+    norm_x = np.array([])
+    for col in x.T:
+        mean_col = np.mean(col)
+        std_col = np.std(col)
+        n_col = ((col - mean_col) / std_col).reshape((-1, 1))
+        if norm_x.shape == (0,):
+            norm_x = n_col
+        else:
+            norm_x = np.hstack((norm_x, n_col))
+    return norm_x
 
 def save_models(results):
     file = open('models.pickle', 'wb')
@@ -30,10 +36,11 @@ def save_models(results):
 def perform_regression(x, y, lambda_):
     print("start")
     theta = np.random.rand(x.shape[1] + 1, 1).reshape(-1, 1)
-    myR =  MyRidge(theta, alpha = 1e-2, max_iter = 1500)
+    myR =  MyRidge(theta, alpha = 1e-2, max_iter = 50000, lambda_=lambda_)
     myR.fit_(x, y)
     print("end")
     return myR
+
 
 def regression_engine(x, y):
     x_train, x_test, y_train, y_test = data_spliter(x, y, 0.8)
@@ -42,7 +49,6 @@ def regression_engine(x, y):
     x_train = normalize(x_train)
     y_train = normalize(y_train)
     models = {}
-    perfs = {}
     for w_rank in range(1, 5):
         w_features = [0, 3, 6, 9][:w_rank]
         for d_rank in range(1, 5):
@@ -54,8 +60,6 @@ def regression_engine(x, y):
                     print(f"w{w_rank}d{d_rank}t{t_rank}λ{lambda_}")
                     current = perform_regression(x_train_features, y_train, lambda_)
                     models[f"w{w_rank}d{d_rank}t{t_rank}λ{lambda_}"] = current#perform_regression(x_train_features, y_train, lambda_)
-                    print(current.get_params_())
-                    perfs[f"w{w_rank}d{d_rank}t{t_rank}λ{lambda_}"] = MyRidge.mse_(y_train, current.predict_(x_train_features))
     save_models(models)
 
 
