@@ -18,7 +18,7 @@ class MyRidge(MyLinearRegression):
             'lambda_': self.lambda_
         }
     
-    def set_params(self, params):
+    def set_params_(self, params):
         try:
             for p in params:
                 if p == 'alpha':
