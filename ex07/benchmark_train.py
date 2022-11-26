@@ -36,7 +36,7 @@ def save_models(results):
 def perform_regression(x, y, lambda_):
     print("start")
     theta = np.random.rand(x.shape[1] + 1, 1).reshape(-1, 1)
-    myR =  MyRidge(theta, alpha = 1e-2, max_iter = 100000, lambda_=lambda_)
+    myR =  MyRidge(theta, alpha = 1e-2, max_iter = 1000000, lambda_=lambda_)
     myR.fit_(x, y)
     print("end")
     return myR
