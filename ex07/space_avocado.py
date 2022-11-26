@@ -75,28 +75,29 @@ def cross_evaluate_models(x, y, models):
     compare_mses(mses)
     return best_model, models[best_model]
 
-def compare_pred(pred, X, Y):
+def compare_pred(preds, X, Y):
     fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
     fig.suptitle("Predictions comparisions")
     ax1.scatter(X[:,0], Y, label="Real values")
-    ax1.scatter(X[:,0], pred, label="Predictions")
-    ax1.legend()
     ax1.set_xlabel("weight")
     ax1.set_ylabel("price")
     ax2.scatter(X[:,1], Y, label="Real values")
-    ax2.scatter(X[:,1], pred, label="Predictions")
-    ax2.legend()
     ax2.set_xlabel("prod_distance")
     ax2.set_ylabel("price")
     ax3.scatter(X[:,2], Y, label="Real values")
-    ax3.scatter(X[:,2], pred, label="Predictions")
-    ax3.legend()
     ax3.set_xlabel("time_delivery")
     ax3.set_ylabel("price")
+    for model in preds:   
+        ax1.scatter(X[:,0], preds[model], label=model)
+        ax2.scatter(X[:,1], preds[model], label=model)
+        ax3.scatter(X[:,2], preds[model], label=model)
+    ax1.legend()
+    ax2.legend()
+    ax3.legend()
     fig.tight_layout()
     plt.show()
 
-def train_model(myLR, model, x, y):
+def train_model(myR, model, x, y):
     x_train, x_test, y_train, y_test = data_spliter(x, y, 0.8)
     x_train = add_polynomial_features(x_train, 4)
     x_train = normalize(x_train)
@@ -104,12 +105,20 @@ def train_model(myLR, model, x, y):
     w_features = [0, 3, 6, 9][:int(model[1])]
     d_features = [1, 4, 7, 10][:int(model[3])]
     t_features = [2, 5, 8, 11][:int(model[5])]
-    x_features = x_train[:, np.concatenate((w_features, d_features, t_features))]
-    myLR.fit_(x_features, y_train)
+    x_train_features = x_train[:, np.concatenate((w_features, d_features, t_features))]
     x_test_features = normalize(add_polynomial_features(x_test, 4))
-    preds = myLR.predict_(x_test_features[:,np.concatenate((w_features, d_features, t_features)) ])
-    preds = unormalize(preds, y_test)
-    compare_pred(preds, x_test, y_test)
+    params = myR.get_params_()
+    params["thetas"] = np.random.rand(x_train_features.shape[1] + 1, 1).reshape(-1, 1)
+    l_preds = {}
+    for l, lambda_ in enumerate([0., 0.2, 0.4, 0.6, 0.8]):
+        model_name = f"{model[:6]}λ{lambda_}"
+        params["lambda_"] = lambda_
+        myR.set_params_(params)
+        myR.fit_(x_train_features, y_train)
+        preds = myR.predict_(x_test_features[:,np.concatenate((w_features, d_features, t_features)) ])
+        preds = unormalize(preds, y_test)
+        l_preds[model_name] = preds
+    compare_pred(l_preds, x_test, y_test)
 
 def main():
     try:

@@ -56,7 +56,7 @@ def regression_engine(x, y):
             for t_rank in range(1, 5):
                 t_features = [2, 5, 8, 11][:t_rank]
                 x_train_features = x_train[:, np.concatenate((w_features, d_features, t_features))]
-                for l, lambda_ in enumerate([0, 0.2, 0.4, 0.6, 0.8, 1.]):
+                for l, lambda_ in enumerate([0., 0.2, 0.4, 0.6, 0.8]):
                     print(f"w{w_rank}d{d_rank}t{t_rank}λ{lambda_}")
                     current = perform_regression(x_train_features, y_train, lambda_)
                     models[f"w{w_rank}d{d_rank}t{t_rank}λ{lambda_}"] = current#perform_regression(x_train_features, y_train, lambda_)
