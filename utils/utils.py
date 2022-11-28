@@ -112,3 +112,12 @@ def f1_score_(y, y_hat, pos_label=1):
         return (2 * prec * recall) / (prec + recall)
     except:
         return None
+
+def multiclass_f1_score_(y, y_hat, labels):
+    try:
+        f1_score_mean = 0
+        for label in labels:
+            f1_score_mean += f1_score_(y, y_hat, label)
+        return f1_score_ / len(labels)
+    except:
+        return None
