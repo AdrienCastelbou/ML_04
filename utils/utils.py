@@ -117,7 +117,8 @@ def multiclass_f1_score_(y, y_hat, labels):
     try:
         f1_score_mean = 0
         for label in labels:
-            f1_score_mean += f1_score_(y, y_hat, label)
-        return f1_score_ / len(labels)
+            f1 = f1_score_(y, y_hat, label)
+            f1_score_mean += f1 if f1 != None else 0
+        return f1_score_mean / len(labels)
     except:
         return None
