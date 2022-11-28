@@ -29,7 +29,7 @@ def normalize(x):
     return norm_x
 
 def save_models(results):
-    file = open('models.pickle', 'wb')
+    file = open('zscore-models.pickle', 'wb')
     pickle.dump(results, file)
     file.close()
 
@@ -47,7 +47,6 @@ def regression_engine(x, y):
     x_cross, y_cross = data_cross_splitter(x, y)
     x_train = add_polynomial_features(x_train, 4)
     x_train = normalize(x_train)
-    y_train = normalize(y_train)
     models = {}
     for w_rank in range(1, 5):
         w_features = [0, 3, 6, 9][:w_rank]

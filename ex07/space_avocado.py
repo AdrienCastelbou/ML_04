@@ -14,7 +14,7 @@ def unormalize(n_X, X):
     return n_X * std_X + mean_X
 
 def load_models():
-    file = open('models.pickle', 'rb')
+    file = open('zscore-models.pickle', 'rb')
     models = pickle.load(file)
     file.close()
     return models
@@ -52,10 +52,6 @@ def cross_evaluate_models(x, y, models):
     x_train, x_test, y_train, y_test = data_spliter(x, y, 0.8)
     x_train = add_polynomial_features(x_train, 4)
     x_train = normalize(x_train)
-    y_train = normalize(y_train)
-    #x_cross, y_cross = data_cross_splitter(x, y)
-    #x_cross = normalize(x_cross)
-    #y_cross = normalize(y_cross)
     best_mse = -1
     best_model = None
     mses = {}
@@ -67,6 +63,7 @@ def cross_evaluate_models(x, y, models):
         x_features = x_train[:, np.concatenate((w_features, d_features, t_features))]
         y_pred = myLR.predict_(x_features)
         current_mse = MyRidge.mse_(y_train, y_pred)
+        print(f"{model} : {current_mse}")
         mses[model] = current_mse
         if best_mse < 0 or current_mse < best_mse:
             best_mse = current_mse
@@ -101,7 +98,6 @@ def train_model(myR, model, x, y):
     x_train, x_test, y_train, y_test = data_spliter(x, y, 0.8)
     x_train = add_polynomial_features(x_train, 4)
     x_train = normalize(x_train)
-    y_train = normalize(y_train)
     w_features = [0, 3, 6, 9][:int(model[1])]
     d_features = [1, 4, 7, 10][:int(model[3])]
     t_features = [2, 5, 8, 11][:int(model[5])]
@@ -116,7 +112,6 @@ def train_model(myR, model, x, y):
         myR.set_params_(params)
         myR.fit_(x_train_features, y_train)
         preds = myR.predict_(x_test_features[:,np.concatenate((w_features, d_features, t_features)) ])
-        preds = unormalize(preds, y_test)
         l_preds[model_name] = preds
     compare_pred(l_preds, x_test, y_test)
 
