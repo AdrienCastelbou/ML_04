@@ -1,5 +1,22 @@
 import numpy as np
 
+def data_cross_splitter(x, y, k=10):
+    x_cross = np.array_split(x, k)
+    y_cross = np.array_split(y, k)
+    return x_cross, y_cross
+
+def normalize(x):
+    norm_x = np.array([])
+    for col in x.T:
+        mean_col = np.mean(col)
+        std_col = np.std(col)
+        n_col = ((col - mean_col) / std_col).reshape((-1, 1))
+        if norm_x.shape == (0,):
+            norm_x = n_col
+        else:
+            norm_x = np.hstack((norm_x, n_col))
+    return norm_x
+
 def data_spliter(x, y, proportion):
     try:
         if type(x) != np.ndarray or type(y) != np.ndarray or type(proportion) != float:
@@ -42,5 +59,56 @@ def add_polynomial_features(x, power):
             for col in x.T:
                 poly_x = np.hstack((poly_x, (col ** i).reshape((-1, 1))))
         return poly_x
+    except:
+        return None
+
+
+def accuracy_score_(y, y_hat):
+    try:
+        if type(y) != np.ndarray or type(y_hat) != np.ndarray or y.shape != y_hat.shape:
+            return None
+        t = 0
+        for y_i, y_hat_i in zip(y, y_hat):
+            if y_i == y_hat_i:
+                t += 1
+        return t / len(y)
+    except:
+        return None
+
+def precision_score_(y, y_hat, pos_label=1):
+    try:
+        if type(y) != np.ndarray or type(y_hat) != np.ndarray or y.shape != y_hat.shape or not isinstance(pos_label, (str, int)):
+            return None
+        tp, fp = 0, 0
+        for y_i, y_hat_i in zip(y, y_hat):
+            if y_hat_i == pos_label and y_i == y_hat_i:
+                tp += 1
+            elif y_hat_i == pos_label and y_i != y_hat_i:
+                fp += 1
+        return tp / (tp + fp)
+    except:
+        return None
+
+def recall_score_(y, y_hat, pos_label=1):
+    try:
+        if type(y) != np.ndarray or type(y_hat) != np.ndarray or y.shape != y_hat.shape or not isinstance(pos_label, (str, int)):
+            return None
+        tp, fn = 0, 0
+        for y_i, y_hat_i in zip(y, y_hat):
+            if y_hat_i == pos_label and y_i == y_hat_i:
+                tp += 1
+            elif y_i == pos_label and y_i != y_hat_i:
+                fn += 1
+        return tp / (tp + fn)
+    except:
+        return None
+
+def f1_score_(y, y_hat, pos_label=1):
+    try:
+        if type(y) != np.ndarray or type(y_hat) != np.ndarray or y.shape != y_hat.shape or not isinstance(pos_label, (str, int)):
+            return None
+        prec = precision_score_(y, y_hat, pos_label)
+        recall = recall_score_(y, y_hat, pos_label)
+        return (2 * prec * recall) / (prec + recall)
     except:
         return None

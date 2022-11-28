@@ -7,26 +7,6 @@ import numpy as np
 import pickle
 import matplotlib.pyplot as plt
 
-def data_cross_splitter(x, y):
-    perm = np.random.permutation(len(x))
-    s_x = x[perm]
-    s_y = y[perm]
-    x_cross = np.split(s_x, 10)
-    y_cross = np.split(s_y, 10)
-    return x_cross, y_cross
-
-
-def normalize(x):
-    norm_x = np.array([])
-    for col in x.T:
-        mean_col = np.mean(col)
-        std_col = np.std(col)
-        n_col = ((col - mean_col) / std_col).reshape((-1, 1))
-        if norm_x.shape == (0,):
-            norm_x = n_col
-        else:
-            norm_x = np.hstack((norm_x, n_col))
-    return norm_x
 
 def save_models(results):
     file = open('zscore-models.pickle', 'wb')
