@@ -73,9 +73,9 @@ def evaluate_model(model, x, y):
             y_hat[i] = 2
         elif best == cl_three_pred:
             y_hat[i] = 3
-    f1score = multiclass_f1_score_(y, y_hat, [0., 1., 2., 3.])
-    print("f1score :" , f1score)
     print(f'Precision : {len(y_hat[y_hat == y])} / {len(y_hat)}')
+    f1score = multiclass_f1_score_(y, y_hat, [0, 1, 2, 3])
+    print("f1score :" , f1score)
     return f1score
     #vizualize_preds(x, y, y_hat)
 
