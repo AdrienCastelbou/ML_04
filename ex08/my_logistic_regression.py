@@ -6,7 +6,7 @@ def arg_checker(fnc):
         for arg in args:
             if type(arg) == MyLogisticRegression:
                 if type(arg.alpha) != float or type(arg.max_iter) != int or not isinstance(arg.lambda_, (float, int))\
-                    or not arg.penality in arg.supported_penalties or type(arg.theta) != np.ndarray:
+                    or (arg.penality != None and not arg.penality in arg.supported_penalties) or type(arg.theta) != np.ndarray:
                     print("Bad params for your model")
                     return None
             else:
