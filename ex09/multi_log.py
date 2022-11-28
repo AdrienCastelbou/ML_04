@@ -82,7 +82,7 @@ def evaluate_model(model, x, y):
 def train_model(X_train, Y_train, lambda_):
     classifiers = []
     for i in range(4):
-        myLR = MyLogisticRegression(theta=np.random.rand(X_train.shape[1] + 1, 1).reshape(-1, 1), max_iter=15000, lambda_=lambda_)
+        myLR = MyLogisticRegression(theta=np.random.rand(X_train.shape[1] + 1, 1).reshape(-1, 1), max_iter=500000, lambda_=lambda_)
         Y_train = engine_Y(np.copy(Y_train), i)
         myLR.fit_(X_train, Y_train)
         classifiers.append(myLR)
@@ -91,6 +91,9 @@ def train_model(X_train, Y_train, lambda_):
 def perform_multi_classification(X, Y):
     X_train, X_test, Y_train, Y_test = data_spliter(X, Y, 0.8)
     X_train = add_polynomial_features(X_train, 3)
+    X_train = normalize(X_train)
+    X_test = add_polynomial_features(X_train, 3)
+    X_test = normalize(X_test)
     models = {}
     models_score = {}
     for h_rank in range(1, 4): 
@@ -100,12 +103,12 @@ def perform_multi_classification(X, Y):
             for b_rank in range(1, 4):
                 b_features = [2, 5, 8, 11][:b_rank]
                 X_train_features = X_train[:, np.concatenate((h_features, w_features, b_features))]
+                X_test_features  = X_test[:, np.concatenate((h_features, w_features, b_features))]
                 for l, lambda_ in enumerate([0., 0.2, 0.4, 0.6, 0.8]):
                     classifiers_rank = f"w{h_rank}d{w_rank}t{b_rank}λ{lambda_}"
                     print(classifiers_rank)
                     models[classifiers_rank] = train_model(X_train_features, Y_train, lambda_)
-                    models_score[classifiers_rank] = evaluate_model(models[classifiers_rank], X_test, Y_test)
-                    break
+                    models_score[classifiers_rank] = evaluate_model(models[classifiers_rank], X_test_features, Y_test)
     save_models({"models_score": models_score, "models": models})
     
         
