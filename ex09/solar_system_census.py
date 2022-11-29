@@ -53,30 +53,8 @@ def evaluate_models(models_score):
         if not best_model or models_score[model_score] > models_score[best_model]:
             best_model = model_score
     print(f"best one => {best_model} : {models_score[best_model]}")
-    #compare_f1_scores_(models_score)
+    compare_f1_scores_(models_score)
     return best_model
-
-def compare_pred(preds, X, Y):
-    fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
-    fig.suptitle("Predictions comparisions")
-    ax1.scatter(X[:,0], Y, label="Real values")
-    ax1.set_xlabel("weight")
-    ax1.set_ylabel("price")
-    ax2.scatter(X[:,1], Y, label="Real values")
-    ax2.set_xlabel("prod_distance")
-    ax2.set_ylabel("price")
-    ax3.scatter(X[:,2], Y, label="Real values")
-    ax3.set_xlabel("time_delivery")
-    ax3.set_ylabel("price")
-    for model in preds:   
-        ax1.scatter(X[:,0], preds[model], label=model)
-        ax2.scatter(X[:,1], preds[model], label=model)
-        ax3.scatter(X[:,2], preds[model], label=model)
-    ax1.legend()
-    ax2.legend()
-    ax3.legend()
-    fig.tight_layout()
-    plt.show()
 
 
 def binarize(Y_train, reference):
