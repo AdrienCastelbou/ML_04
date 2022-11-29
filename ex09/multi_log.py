@@ -9,21 +9,13 @@ import matplotlib.pyplot as plt
 import pickle
 
 def save_models(results):
-    file = open('zscore-models.pickle', 'wb')
+    file = open('tmp-models.pickle', 'wb')
     pickle.dump(results, file)
     file.close()
 
-def engine_Y(Y_train, reference):
-    for i in range(Y_train.shape[0]):
-        if reference == float(Y_train[i]):
-            Y_train[i] = 1.
-        else:
-            Y_train[i] = 0.
-    return Y_train
-
 def load_datasets():
     content = pd.read_csv("solar_system_census.csv")
-    X = np.array(content[["weight", "height", "bone_density"]])
+    X = np.array(content[["height", "weight", "bone_density"]])
     if X.shape[1] !=  3:
         raise Exception("Datas are missing in solar_system_census.csv")        
     content = pd.read_csv("solar_system_census_planets.csv")
@@ -73,18 +65,27 @@ def evaluate_model(model, x, y):
             y_hat[i] = 2
         elif best == cl_three_pred:
             y_hat[i] = 3
+        print(y[i], y_hat[i], cl_zero_pred, cl_one_pred, cl_two_pred, cl_three_pred)
     print(f'Precision : {len(y_hat[y_hat == y])} / {len(y_hat)}')
     f1score = multiclass_f1_score_(y, y_hat, [0, 1, 2, 3])
     print("f1score :" , f1score)
     return f1score
     #vizualize_preds(x, y, y_hat)
 
+def binarize(Y_train, reference):
+    bin_ = np.zeros(Y_train.shape)
+    for i in range(bin_.shape[0]):
+        if reference == float(Y_train[i]):
+            bin_[i] = 1.
+        else:
+            bin_[i] = 0.
+    return bin_
+
 def train_model(X_train, Y_train, lambda_):
     classifiers = []
     for i in range(4):
-        myLR = MyLogisticRegression(theta=np.random.rand(X_train.shape[1] + 1, 1).reshape(-1, 1), max_iter=500000, lambda_=lambda_)
-        Y_train = engine_Y(np.copy(Y_train), i)
-        myLR.fit_(X_train, Y_train)
+        myLR = MyLogisticRegression(theta=np.random.rand(X_train.shape[1] + 1, 1).reshape(-1, 1), alpha=1e-1, max_iter=10000, lambda_=lambda_)
+        myLR.fit_(X_train, binarize(Y_train, i))
         classifiers.append(myLR)
     return classifiers
 
@@ -92,7 +93,7 @@ def perform_multi_classification(X, Y):
     X_train, X_test, Y_train, Y_test = data_spliter(X, Y, 0.8)
     X_train = add_polynomial_features(X_train, 3)
     X_train = normalize(X_train)
-    X_test = add_polynomial_features(X_train, 3)
+    X_test = add_polynomial_features(X_test, 3)
     X_test = normalize(X_test)
     models = {}
     models_score = {}
