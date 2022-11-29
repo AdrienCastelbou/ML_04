@@ -71,6 +71,8 @@ def accuracy_score_(y, y_hat):
         for y_i, y_hat_i in zip(y, y_hat):
             if y_i == y_hat_i:
                 t += 1
+        if len(y) == 0:
+            return 0
         return t / len(y)
     except:
         return None
@@ -85,6 +87,8 @@ def precision_score_(y, y_hat, pos_label=1):
                 tp += 1
             elif y_hat_i == pos_label and y_i != y_hat_i:
                 fp += 1
+        if tp + fp == 0:
+            return 0
         return tp / (tp + fp)
     except:
         return None
@@ -99,6 +103,8 @@ def recall_score_(y, y_hat, pos_label=1):
                 tp += 1
             elif y_i == pos_label and y_i != y_hat_i:
                 fn += 1
+        if tp + fn == 0:
+            return 0
         return tp / (tp + fn)
     except:
         return None
@@ -109,6 +115,8 @@ def f1_score_(y, y_hat, pos_label=1):
             return None
         prec = precision_score_(y, y_hat, pos_label)
         recall = recall_score_(y, y_hat, pos_label)
+        if prec + recall == 0:
+            return 0
         return (2 * prec * recall) / (prec + recall)
     except:
         return None
@@ -118,7 +126,7 @@ def multiclass_f1_score_(y, y_hat, labels):
         f1_score_mean = 0
         for label in labels:
             f1 = f1_score_(y, y_hat, label)
-            f1_score_mean += f1 if f1 != None else 0
+            f1_score_mean += f1
         return f1_score_mean / len(labels)
     except:
         return None
