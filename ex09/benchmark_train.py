@@ -8,8 +8,16 @@ from ex08.my_logistic_regression import *
 import matplotlib.pyplot as plt
 import pickle
 
+def data_cross_splitter(x, y, k=10):
+    perm = np.random.permutation(len(x))
+    s_x = x[perm]
+    s_y = y[perm]
+    x_cross = np.array_split(s_x, k)
+    y_cross = np.array_split(s_y, k)
+    return x_cross, y_cross
+
 def save_models(results):
-    file = open('models.pickle', 'wb')
+    file = open('cross_models.pickle', 'wb')
     pickle.dump(results, file)
     file.close()
 
@@ -79,20 +87,26 @@ def binarize(Y_train, reference):
             bin_[i] = 0.
     return bin_
 
-def train_model(X_train, Y_train, lambda_):
-    classifiers = []
-    for i in range(4):
-        myLR = MyLogisticRegression(theta=np.random.rand(X_train.shape[1] + 1, 1).reshape(-1, 1), alpha=1e-1, max_iter=10000, lambda_=lambda_)
-        myLR.fit_(X_train, binarize(Y_train, i))
-        classifiers.append(myLR)
-    return classifiers
+def train_model(x, y, lambda_):
+    x_cross, y_cross = data_cross_splitter(x, y, 4)
+    f1_scores = []
+    for k in range(len(x_cross)):
+        print(f"fold {k}")
+        x_folds_test = np.concatenate([x_fold for i, x_fold in enumerate(x_cross) if i!=k])
+        x_fold_evaluate = x_cross[k]
+        y_folds_test = np.concatenate([y_fold for i, y_fold in enumerate(y_cross) if i!=k])
+        y_fold_evaluate = y_cross[k]
+        classifiers = []
+        for i in range(4):
+            myLR = MyLogisticRegression(theta=np.random.rand(x.shape[1] + 1, 1).reshape(-1, 1), alpha=1e-1, max_iter=10000, lambda_=lambda_)
+            myLR.fit_(x_folds_test, binarize(y_folds_test, i))
+            classifiers.append(myLR)
+        f1_scores.append(evaluate_model(classifiers, x_fold_evaluate, y_fold_evaluate))
+    return classifiers, np.mean(f1_scores)
 
 def perform_multi_classification(X, Y):
-    X_train, X_test, Y_train, Y_test = data_spliter(X, Y, 0.7)
-    X_train = add_polynomial_features(X_train, 3)
+    X_train = add_polynomial_features(X, 3)
     X_train = normalize(X_train)
-    X_test = add_polynomial_features(X_test, 3)
-    X_test = normalize(X_test)
     models = {}
     models_score = {}
     for h_rank in range(1, 4): 
@@ -102,13 +116,11 @@ def perform_multi_classification(X, Y):
             for b_rank in range(1, 4):
                 b_features = [2, 5, 8, 11][:b_rank]
                 X_train_features = X_train[:, np.concatenate((h_features, w_features, b_features))]
-                X_test_features  = X_test[:, np.concatenate((h_features, w_features, b_features))]
                 for l, lambda_ in enumerate([0., 0.2, 0.4, 0.6, 0.8]):
                     classifiers_rank = f"w{h_rank}d{w_rank}t{b_rank}λ{lambda_}"
                     print(classifiers_rank)
-                    models[classifiers_rank] = train_model(X_train_features, Y_train, lambda_)
-                    models_score[classifiers_rank] = evaluate_model(models[classifiers_rank], X_test_features, Y_test)
-                    
+                    models[classifiers_rank], models_score[classifiers_rank] = train_model(X_train_features, Y, lambda_)  
+                    print("F1 score mean : ", models_score[classifiers_rank])                  
     save_models({"models_score": models_score, "models": models})
     
         
