@@ -14,7 +14,7 @@ def unormalize(n_X, X):
     return n_X * std_X + mean_X
 
 def load_models():
-    file = open('zscore-models.pickle', 'rb')
+    file = open('models.pickle', 'rb')
     models = pickle.load(file)
     file.close()
     return models
