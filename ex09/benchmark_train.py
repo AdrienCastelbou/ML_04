@@ -17,7 +17,7 @@ def data_cross_splitter(x, y, k=10):
     return x_cross, y_cross
 
 def save_models(results):
-    file = open('cross_models.pickle', 'wb')
+    file = open('models.pickle', 'wb')
     pickle.dump(results, file)
     file.close()
 
