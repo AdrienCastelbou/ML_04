@@ -88,7 +88,7 @@ def binarize(Y_train, reference):
     return bin_
 
 def train_model(x, y, lambda_):
-    x_cross, y_cross = data_cross_splitter(x, y, 4)
+    x_cross, y_cross = data_cross_splitter(x, y)
     f1_scores = []
     for k in range(len(x_cross)):
         print(f"fold {k}")
